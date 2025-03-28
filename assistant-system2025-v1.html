@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>2025 系統年－醫事助理制度建置｜角色扮演遊戲 v1</title>
+  <style>
+    body { font-family: "Helvetica Neue", sans-serif; padding: 1em; margin: auto; max-width: 720px; background-color: #f4f4f4; }
+    h1, h2 { text-align: center; color: #333; }
+    .question-box { background: white; padding: 1em; margin-top: 1em; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .option { padding: 0.6em; margin: 0.5em 0; background-color: #e0e0e0; border-radius: 5px; cursor: pointer; }
+    .option:hover { background-color: #d0d0d0; }
+    #progressBar { width: 100%; background-color: #ccc; height: 20px; border-radius: 10px; margin-top: 10px; }
+    #progressFill { height: 100%; width: 0%; background-color: #4caf50; border-radius: 10px; }
+    .hidden { display: none; }
+    #startGameBtn, #nextBtn, #submitScoreBtn, #shareBtn { margin-top: 1em; width: 100%; padding: 0.75em; font-size: 16px; border: none; border-radius: 8px; }
+    #startGameBtn { background: #1976d2; color: white; }
+    #nextBtn { background: #4caf50; color: white; }
+    #submitScoreBtn, #shareBtn { background: #9c27b0; color: white; }
+    input[type=text] { width: 100%; padding: 0.5em; margin-top: 1em; }
+    ol { padding-left: 1.25em; }
+  </style>
+</head>
+<body>
+  <h1>2025 系統年－醫事助理制度建置</h1>
+  <h2>角色扮演學習遊戲｜v1</h2>
+
+  <div id="startScreen" class="question-box">
+    <p>這是一場橫跨六大角色的制度建置模擬任務！</p>
+    <p>你將依序扮演助理、主任、院長、醫師、教育中心與非醫療部門，體驗整個制度從草案到執行的歷程。</p>
+    <button id="startGameBtn">🚀 開始挑戰</button>
+  </div>
+
+  <div id="game" class="question-box hidden">
+    <h2 id="roleTitle">角色名稱</h2>
+    <p id="rolePretext">角色前情提要</p>
+    <h3 id="questionText">題目內容</h3>
+    <div id="options"></div>
+    <div id="progressBar"><div id="progressFill"></div></div>
+  </div>
+
+  <div id="result" class="question-box hidden">
+    <h2>你的總分為：<span id="totalScore">0</span> / 100</h2>
+    <input type="text" id="nickname" placeholder="請輸入暱稱">
+    <button id="submitScoreBtn">送出並觀看排行榜</button>
+  </div>
+
+  <div id="leaderboard" class="question-box hidden">
+    <h2>排行榜</h2>
+    <ol id="rankList"></ol>
+    <button id="shareBtn">分享分數 ✨</button>
+  </div>
+
+  <script>
+    // 此版本為 v1 架構，題庫與互動邏輯將在後續版本逐步完善
+  </script>
+</body>
+</html>
