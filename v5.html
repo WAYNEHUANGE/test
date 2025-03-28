@@ -64,7 +64,6 @@
       cursor: pointer;
     }
     #startGameBtn { background: #1976d2; }
-    #nextBtn { background: #4caf50; }
     #submitScoreBtn { background: #9c27b0; }
     #shareBtn { background: #ff9800; }
     input[type="text"] {
@@ -98,12 +97,12 @@
     <h3 id="questionText"></h3>
     <div id="options"></div>
     <div id="progressBar"><div id="progressFill">0%</div></div>
-    <button id="nextBtn" class="hidden">下一題</button>
   </div>
 
   <!-- 結果頁 -->
   <div id="result" class="question-box hidden">
     <h2>你的總分：<span id="totalScore">0</span> / 100</h2>
+    <div id="incorrectList"></div>
     <p>請輸入你的暱稱：</p>
     <input type="text" id="nickname" placeholder="輸入暱稱">
     <button id="submitScoreBtn">送出分數並觀看排行榜</button>
@@ -117,14 +116,9 @@
     <div class="question-box" style="margin-top:20px;">
       <h3>今年計畫藍圖與接力圖</h3>
       <p>
-        隨著組織擴大與分院增加，我們迫切需要一套「可複製、可落地、可傳承」的醫療知識與流程標準。<br/>
-        我們將訓練與制度建設劃分為三大主軸：<br/>
-        - <strong>醫療品質：</strong>診斷 治療 等醫療品質原則標準化。<br/>
-        - <strong>醫療營運：</strong>掛號、住出院、病歷作業、行政流程標準化。<br/>
-        - <strong>醫病關係：</strong>接待、溝通、悲傷輔導、客訴處理與衛教。<br/><br/>
-        接力賽模式：<br/>
-        助理與主任先提出草案，院長與醫師調整成臨床共識，教育中心與非醫療部門統整成最終標準。<br/>
-        每一棒都至關重要，只有大家齊心協力，制度才能真正落地並成為我們組織的文化！
+        在2025這個「系統年」，我們啟動了醫事助理制度建置計畫。隨著組織擴張，我們迫切需要一套能複製、能教學、能傳承的流程標準，不只是為了提升效率，更是為了讓每一位新人與老手，都能在同一條軌道上並肩前行。<br/><br/>
+        這是一場跨部門、跨院區的接力賽：助理與主任先從實務出發，提出現場版本；院長與醫師接棒，補上臨床觀點並建立共識；教育中心與總部單位最終把這些草案轉化為教材與標準制度。<br/><br/>
+        制度從來不是紙上談兵，而是每一位參與者共同奔跑的痕跡。我們相信，只要每一棒都跑得真誠、跑得明確，我們就能打造一套真正屬於我們的醫療文化系統。
       </p>
     </div>
   </div>
@@ -232,7 +226,7 @@
           },
           {
             text: "教育中心最大的貢獻是？",
-            options: ["收件與排版", "制度建立與版本控管", "流程交給行政"],
+            options: ["收件與排版", "制度建立與統整教學", "流程交給行政"],
             answer: 1
           }
         ]
@@ -248,7 +242,7 @@
           },
           {
             text: "你可以怎麼幫忙？",
-            options: ["理解如何對接醫療", "建立薪資制度", "制定醫療標準"],
+            options: ["理解醫療運作系統並尋找協作機會", "建立薪資制度", "制定醫療標準"],
             answer: 0
           },
           {
@@ -265,6 +259,7 @@
     let currentQuestionIndex = 0;
     let score = 0;
     const totalQuestions = roles.reduce((sum, role) => sum + role.questions.length, 0);
+    let incorrectQuestions = [];
     
     const roleSelectionDiv = document.getElementById("roleSelection");
     const roleButtonsDiv = document.getElementById("roleButtons");
@@ -318,7 +313,16 @@
         btn.className = "option";
         btn.innerText = opt;
         btn.onclick = () => {
-          if (idx === q.answer) score++;
+          if (idx === q.answer) {
+            score++;
+          } else {
+            incorrectQuestions.push({
+              role: role.name,
+              question: q.text,
+              correct: q.options[q.answer]
+            });
+          }
+          // 自動進入下一題
           setTimeout(() => { nextQuestion(); }, 300);
         };
         optionsDiv.appendChild(btn);
@@ -351,6 +355,15 @@
       resultDiv.classList.remove("hidden");
       const percentScore = Math.round((score / totalQuestions) * 100);
       totalScoreEl.innerText = percentScore;
+      // 顯示答錯題目與正確答案
+      if (incorrectQuestions.length > 0) {
+        let html = "<h3>答錯題目與正確答案：</h3><ul>";
+        incorrectQuestions.forEach(item => {
+          html += "<li><strong>" + item.role + "：</strong>" + item.question + "<br/><em>正確答案：</em> " + item.correct + "</li>";
+        });
+        html += "</ul>";
+        resultDiv.innerHTML += html;
+      }
     }
     
     submitScoreBtn.onclick = () => {
