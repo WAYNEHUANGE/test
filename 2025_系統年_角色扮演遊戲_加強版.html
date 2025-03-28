@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>2025 系統年｜角色接力挑戰遊戲</title>
+    <style>
+        body { font-family: "Noto Sans TC", sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2, h3 { color: #333; }
+        .hidden { display: none; }
+        button { padding: 10px 18px; margin: 8px; background-color: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #004b99; }
+        .quiz { margin-top: 20px; }
+        .nickname-section { text-align: center; }
+        input[type="text"] { padding: 8px; font-size: 16px; width: 60%; margin: 10px 0; }
+        .scoreboard { margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>2025 系統年｜角色接力挑戰</h1>
+    <div class="nickname-section">
+        <p>請輸入你的暱稱開始遊戲：</p>
+        <input type="text" id="nickname" placeholder="輸入暱稱">
+        <button onclick="startGame()">開始遊戲</button>
+    </div>
+
+    <div id="game" class="hidden">
+        <h2>選擇你的角色</h2>
+        <div id="role-buttons">
+            <button onclick="chooseRole('assistant')">我是助理</button>
+            <button onclick="chooseRole('supervisor')">我是主任</button>
+            <button onclick="chooseRole('director')">我是院長</button>
+            <button onclick="chooseRole('doctor')">我是獸醫師</button>
+            <button onclick="chooseRole('education')">我是教育中心</button>
+            <button onclick="chooseRole('support')">我是總部夥伴</button>
+        </div>
+
+        <div id="quiz-section" class="quiz hidden">
+            <h3 id="role-title"></h3>
+            <p id="question"></p>
+            <div id="options"></div>
+        </div>
+
+        <div id="scoreboard" class="scoreboard hidden">
+            <h2>遊戲結果</h2>
+            <p><strong>暱稱：</strong><span id="final-name"></span></p>
+            <p><strong>得分：</strong><span id="final-score"></span> / 3</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let nickname = "";
+    let currentScore = 0;
+    let currentQuestion = 0;
+    let currentRole = "";
+
+    const quizData = {
+        assistant: {
+            title: "👩‍⚕️ 助理",
+            questions: [
+                { q: "你每天在現場怎麼做流程該怎麼處理？", options: ["記下來，寫進草案", "憑印象講", "讓主任自己想"], correct: 0 },
+                { q: "發現流程有不確定怎麼辦？", options: ["不寫", "先寫下來並註明問題", "交給其他人"], correct: 1 },
+                { q: "你覺得醫師不會看你寫的草案時？", options: ["乾脆不寫", "還是盡力完成", "抱怨"], correct: 1 }
+            ]
+        },
+        supervisor: {
+            title: "🧑‍🏫 主任",
+            questions: [
+                { q: "主任的任務是？", options: ["發指令", "引導助理整理流程", "等待草案交來"], correct: 1 },
+                { q: "如何面對助理的不確定？", options: ["催交", "鼓勵與討論", "無視"], correct: 1 },
+                { q: "交稿品質參差不齊時？", options: ["照單全收", "幫忙補齊與標準化", "全部退回"], correct: 1 }
+            ]
+        },
+        // 更多角色可加上來
+    };
+
+    function startGame() {
+        nickname = document.getElementById("nickname").value.trim();
+        if (!nickname) {
+            alert("請輸入暱稱！");
+            return;
+        }
+        document.querySelector(".nickname-section").classList.add("hidden");
+        document.getElementById("game").classList.remove("hidden");
+    }
+
+    function chooseRole(role) {
+        currentRole = role;
+        currentScore = 0;
+        currentQuestion = 0;
+        document.getElementById("role-buttons").classList.add("hidden");
+        document.getElementById("quiz-section").classList.remove("hidden");
+        document.getElementById("role-title").innerText = quizData[role].title;
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const roleQuiz = quizData[currentRole];
+        if (currentQuestion >= roleQuiz.questions.length) {
+            showResult();
+            return;
+        }
+        const qData = roleQuiz.questions[currentQuestion];
+        document.getElementById("question").innerText = qData.q;
+        const optionsDiv = document.getElementById("options");
+        optionsDiv.innerHTML = "";
+        qData.options.forEach((opt, idx) => {
+            const btn = document.createElement("button");
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(idx, qData.correct);
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected, correct) {
+        if (selected === correct) currentScore++;
+        currentQuestion++;
+        showQuestion();
+    }
+
+    function showResult() {
+        document.getElementById("quiz-section").classList.add("hidden");
+        document.getElementById("scoreboard").classList.remove("hidden");
+        document.getElementById("final-name").innerText = nickname;
+        document.getElementById("final-score").innerText = currentScore;
+    }
+</script>
+</body>
+</html>
