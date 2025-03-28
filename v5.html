@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>2025 系統年－醫事助理制度建置｜角色扮演遊戲 v5</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue", sans-serif;
+      margin: 0;
+      padding: 1em;
+      background-color: #f6f8fa;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    h1, h2, h3 { text-align: center; color: #333; }
+    /* 調整選擇角色頁面文字為黑色 */
+    #roleSelection, #roleSelection h2, #roleSelection p, #roleButtons button {
+      color: #000;
+    }
+    .question-box {
+      background: #fff8e1;
+      padding: 1em;
+      margin-top: 1em;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .option {
+      display: block;
+      padding: 0.6em;
+      margin: 0.5em 0;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .option:hover { background-color: #d0d0d0; }
+    #progressBar {
+      width: 100%;
+      background-color: #ccc;
+      height: 20px;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+    #progressFill {
+      height: 100%;
+      width: 0%;
+      background-color: #4caf50;
+      border-radius: 10px;
+      text-align: center;
+      color: #fff;
+      line-height: 20px;
+      font-size: 14px;
+    }
+    .hidden { display: none; }
+    button {
+      margin-top: 1em;
+      width: 100%;
+      padding: 0.75em;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+    }
+    #startGameBtn { background: #1976d2; }
+    #nextBtn { background: #4caf50; }
+    #submitScoreBtn { background: #9c27b0; }
+    #shareBtn { background: #ff9800; }
+    input[type="text"] {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 1em;
+      font-size: 16px;
+    }
+    ol { padding-left: 1.25em; }
+    @media (max-width: 600px) {
+      body { padding: 0.5em; }
+      button { font-size: 18px; padding: 1em; }
+      input[type="text"] { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <h1>2025 系統年－醫事助理制度建置</h1>
+  <h2>角色扮演遊戲 v5</h2>
+
+  <!-- 角色選擇頁 -->
+  <div id="roleSelection" class="question-box">
+    <h2>請選擇你要扮演的角色</h2>
+    <div id="roleButtons"></div>
+  </div>
+
+  <!-- 遊戲頁 -->
+  <div id="game" class="question-box hidden">
+    <h2 id="roleTitle"></h2>
+    <p id="rolePretext"></p>
+    <h3 id="questionText"></h3>
+    <div id="options"></div>
+    <div id="progressBar"><div id="progressFill">0%</div></div>
+    <button id="nextBtn" class="hidden">下一題</button>
+  </div>
+
+  <!-- 結果頁 -->
+  <div id="result" class="question-box hidden">
+    <h2>你的總分：<span id="totalScore">0</span> / 100</h2>
+    <p>請輸入你的暱稱：</p>
+    <input type="text" id="nickname" placeholder="輸入暱稱">
+    <button id="submitScoreBtn">送出分數並觀看排行榜</button>
+  </div>
+
+  <!-- 排行榜與計畫藍圖頁 -->
+  <div id="leaderboard" class="question-box hidden">
+    <h2>排行榜</h2>
+    <ol id="rankList"></ol>
+    <button id="shareBtn">分享我的分數 ✨</button>
+    <div class="question-box" style="margin-top:20px;">
+      <h3>今年計畫藍圖與接力圖</h3>
+      <p>
+        隨著組織擴大與分院增加，我們迫切需要一套「可複製、可落地、可傳承」的醫療知識與流程標準。<br/>
+        我們將訓練與制度建設劃分為三大主軸：<br/>
+        - <strong>醫療品質：</strong>急救、住院、內外科輔助、藥品管理、感染控制。<br/>
+        - <strong>醫療營運：</strong>掛號、住出院、病歷作業、行政流程標準化。<br/>
+        - <strong>醫病關係：</strong>接待、溝通、悲傷輔導、客訴處理與衛教。<br/><br/>
+        接力賽模式：<br/>
+        助理與主任先提出草案，院長與醫師調整成臨床共識，教育中心與非醫療部門統整成最終標準。<br/>
+        每一棒都至關重要，只有大家齊心協力，制度才能真正落地並成為我們組織的文化！
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // 六個角色題庫資料：每個角色 3 題
+    const roles = [
+      {
+        name: "助理",
+        pretext: "你是制度接力的起跑者，要將日常流程轉化為制度草案。",
+        questions: [
+          {
+            text: "你每天都在做的流程，要如何寫進制度草案？",
+            options: ["寫大概就好", "詳細寫出現況與不確定之處", "不寫，反正醫師會改"],
+            answer: 1
+          },
+          {
+            text: "你發現流程中某段常常改變怎麼辦？",
+            options: ["直接略過", "記下每種做法", "只寫最新版本"],
+            answer: 1
+          },
+          {
+            text: "你認為流程草案最大的價值是？",
+            options: ["讓大家更輕鬆", "讓主管知道我很忙", "讓團隊有統一標準"],
+            answer: 2
+          }
+        ]
+      },
+      {
+        name: "主任",
+        pretext: "你是助理的引導者，協助彙整內容並完善草案。",
+        questions: [
+          {
+            text: "助理草案混亂時你會？",
+            options: ["協助釐清與整理", "丟回去說重寫", "照單全收"],
+            answer: 0
+          },
+          {
+            text: "如何協助助理產出高品質內容？",
+            options: ["陪著一起開流程會議", "單獨責備寫不好的", "完全不干涉"],
+            answer: 0
+          },
+          {
+            text: "主任的任務是什麼？",
+            options: ["分配交件", "成為制度內容協作者", "審核醫療知識"],
+            answer: 1
+          }
+        ]
+      },
+      {
+        name: "院長",
+        pretext: "你是制度是否能臨床落地的重要守門人。",
+        questions: [
+          {
+            text: "院長看流程草案的首要任務是？",
+            options: ["找錯字", "檢查是否臨床能執行", "丟給醫師決定"],
+            answer: 1
+          },
+          {
+            text: "發現草案與臨床不同時？",
+            options: ["直接否決", "指出原因並建議修正", "保持沉默"],
+            answer: 1
+          },
+          {
+            text: "你對制度推進最重要的貢獻是？",
+            options: ["保護現場邏輯", "制定獎懲制度", "拒絕所有修改"],
+            answer: 0
+          }
+        ]
+      },
+      {
+        name: "醫師",
+        pretext: "你是流程能否真正執行下去的最後關卡。",
+        questions: [
+          {
+            text: "流程草案不符合習慣時你應？",
+            options: ["不理會", "回饋例外情境與細節", "丟掉"],
+            answer: 1
+          },
+          {
+            text: "流程共識的建立是？",
+            options: ["行政決定", "一起調整最適做法", "醫師個人決定"],
+            answer: 1
+          },
+          {
+            text: "醫師最應該參與的是？",
+            options: ["流程的修正與討論", "藥品進貨", "主訓練"],
+            answer: 0
+          }
+        ]
+      },
+      {
+        name: "教育中心",
+        pretext: "你是制度整合、標準化與教材化的關鍵工程師。",
+        questions: [
+          {
+            text: "你撰寫制度文件時應？",
+            options: ["直接轉貼草案", "統整用語、標明節點", "用圖代替全部內容"],
+            answer: 1
+          },
+          {
+            text: "好的教材格式是？",
+            options: ["能被教、能記住、能更新", "最短最快", "能嚇退新手"],
+            answer: 0
+          },
+          {
+            text: "教育中心最大的貢獻是？",
+            options: ["收件與排版", "制度工程與教學設計", "流程交給行政"],
+            answer: 1
+          }
+        ]
+      },
+      {
+        name: "非醫療部門",
+        pretext: "你是制度落地與擴散的支援與擴音器。",
+        questions: [
+          {
+            text: "流程文件與你有關嗎？",
+            options: ["完全無關", "有，會影響訓練、品牌與行政", "交給醫療就好"],
+            answer: 1
+          },
+          {
+            text: "你可以怎麼幫忙？",
+            options: ["支援設計素材與測試可讀性", "建立薪資制度", "制定醫療標準"],
+            answer: 0
+          },
+          {
+            text: "制度可持續的關鍵是？",
+            options: ["醫師喜歡", "跨部門一起維運", "有預算"],
+            answer: 1
+          }
+        ]
+      }
+    ];
+    
+    let playedRoles = [];
+    let currentRoleIndex = -1;
+    let currentQuestionIndex = 0;
+    let score = 0;
+    const totalQuestions = roles.reduce((sum, role) => sum + role.questions.length, 0);
+    
+    const roleSelectionDiv = document.getElementById("roleSelection");
+    const roleButtonsDiv = document.getElementById("roleButtons");
+    const gameDiv = document.getElementById("game");
+    const roleTitleEl = document.getElementById("roleTitle");
+    const rolePretextEl = document.getElementById("rolePretext");
+    const questionTextEl = document.getElementById("questionText");
+    const optionsDiv = document.getElementById("options");
+    const progressFillEl = document.getElementById("progressFill");
+    const resultDiv = document.getElementById("result");
+    const totalScoreEl = document.getElementById("totalScore");
+    const submitScoreBtn = document.getElementById("submitScoreBtn");
+    const shareBtn = document.getElementById("shareBtn");
+    
+    function showRoleSelection() {
+      roleButtonsDiv.innerHTML = "";
+      roles.forEach((role, idx) => {
+        let btnText = role.name;
+        if (playedRoles.includes(idx)) { btnText += " (已完成)"; }
+        const btn = document.createElement("button");
+        btn.innerText = btnText;
+        btn.onclick = () => { startRole(idx); };
+        roleButtonsDiv.appendChild(btn);
+      });
+      roleSelectionDiv.classList.remove("hidden");
+      gameDiv.classList.add("hidden");
+      resultDiv.classList.add("hidden");
+    }
+    
+    function startRole(idx) {
+      if (playedRoles.includes(idx)) {
+        alert("這個角色已完成，請選擇其他角色。");
+        return;
+      }
+      currentRoleIndex = idx;
+      currentQuestionIndex = 0;
+      roleSelectionDiv.classList.add("hidden");
+      gameDiv.classList.remove("hidden");
+      loadQuestion();
+    }
+    
+    function loadQuestion() {
+      const role = roles[currentRoleIndex];
+      const q = role.questions[currentQuestionIndex];
+      roleTitleEl.innerText = role.name;
+      rolePretextEl.innerText = role.pretext;
+      questionTextEl.innerText = q.text;
+      optionsDiv.innerHTML = "";
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement("div");
+        btn.className = "option";
+        btn.innerText = opt;
+        btn.onclick = () => {
+          if (idx === q.answer) score++;
+          setTimeout(() => { nextQuestion(); }, 300);
+        };
+        optionsDiv.appendChild(btn);
+      });
+      updateProgress();
+    }
+    
+    function nextQuestion() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex >= roles[currentRoleIndex].questions.length) {
+        playedRoles.push(currentRoleIndex);
+        showRoleSelection();
+        if (playedRoles.length === roles.length) {
+          showResult();
+        }
+        return;
+      }
+      loadQuestion();
+    }
+    
+    function updateProgress() {
+      const answered = roles.slice(0, currentRoleIndex).reduce((sum, role) => sum + role.questions.length, 0) + currentQuestionIndex;
+      const percent = Math.round((answered / totalQuestions) * 100);
+      progressFillEl.style.width = percent + "%";
+      progressFillEl.innerText = percent + "%";
+    }
+    
+    function showResult() {
+      gameDiv.classList.add("hidden");
+      resultDiv.classList.remove("hidden");
+      const percentScore = Math.round((score / totalQuestions) * 100);
+      totalScoreEl.innerText = percentScore;
+    }
+    
+    submitScoreBtn.onclick = () => {
+      const nickname = document.getElementById("nickname").value || "匿名";
+      const percentScore = Math.round((score / totalQuestions) * 100);
+      let leaderboard = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+      leaderboard.push({ name: nickname, score: percentScore });
+      leaderboard.sort((a, b) => b.score - a.score);
+      localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+      showLeaderboard();
+    };
+    
+    function showLeaderboard() {
+      resultDiv.classList.add("hidden");
+      document.getElementById("leaderboard").classList.remove("hidden");
+      const list = document.getElementById("rankList");
+      list.innerHTML = "";
+      const leaderboard = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+      leaderboard.slice(0, 10).forEach(item => {
+        const li = document.createElement("li");
+        li.innerText = item.name + ": " + item.score + " 分";
+        list.appendChild(li);
+      });
+    }
+    
+    shareBtn.onclick = () => {
+      const scoreText = totalScoreEl.innerText;
+      const message = "我剛在「2025 系統年－醫事助理制度建置遊戲」中獲得 " + scoreText + " 分！快來挑戰吧！";
+      navigator.clipboard.writeText(message + "\n" + window.location.href)
+        .then(() => { alert("分數與連結已複製，快分享給你的朋友！"); })
+        .catch(() => { alert("複製失敗，請手動複製。"); });
+    };
+    
+    showRoleSelection();
+  </script>
+</body>
+</html>
