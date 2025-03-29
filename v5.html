@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>2025 系統年－醫事助理制度建置｜角色扮演遊戲 v5</title>
+  <title>2025 系統年－醫事助理制度建置｜角色扮演遊戲 v6</title>
   <style>
     body {
       font-family: "Helvetica Neue", sans-serif;
@@ -82,7 +82,7 @@
 </head>
 <body>
   <h1>2025 系統年－醫事助理制度建置</h1>
-  <h2>角色扮演遊戲 v5</h2>
+  <h2>角色扮演遊戲 v6</h2>
 
   <!-- 角色選擇頁 -->
   <div id="roleSelection" class="question-box">
@@ -102,7 +102,7 @@
   <!-- 結果頁 -->
   <div id="result" class="question-box hidden">
     <h2>你的總分：<span id="totalScore">0</span> / 100</h2>
-    <div id="incorrectList"></div>
+    <div id="incorrectContainer"></div>
     <p>請輸入你的暱稱：</p>
     <input type="text" id="nickname" placeholder="輸入暱稱">
     <button id="submitScoreBtn">送出分數並觀看排行榜</button>
@@ -356,14 +356,17 @@
       const percentScore = Math.round((score / totalQuestions) * 100);
       totalScoreEl.innerText = percentScore;
       // 顯示答錯題目與正確答案
+      const incorrectContainer = document.createElement("div");
+      incorrectContainer.id = "incorrectContainer";
       if (incorrectQuestions.length > 0) {
         let html = "<h3>答錯題目與正確答案：</h3><ul>";
         incorrectQuestions.forEach(item => {
           html += "<li><strong>" + item.role + "：</strong>" + item.question + "<br/><em>正確答案：</em> " + item.correct + "</li>";
         });
         html += "</ul>";
-        resultDiv.innerHTML += html;
+        incorrectContainer.innerHTML = html;
       }
+      resultDiv.appendChild(incorrectContainer);
     }
     
     submitScoreBtn.onclick = () => {
